@@ -1,0 +1,6 @@
+{
+  "Food": {"base_price": 5.0, "utility": 10},
+  "Water": {"base_price": 2.0, "utility": 8},
+  "Wood": {"base_price": 4.0, "utility": 2},
+  "Ore": {"base_price": 6.0, "utility": 3}
+}

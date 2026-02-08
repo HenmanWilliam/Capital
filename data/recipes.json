@@ -1,0 +1,26 @@
+[
+  {
+    "id": "forestry",
+    "inputs": {},
+    "outputs": {"Wood": 2.0},
+    "labor_required": 1
+  },
+  {
+    "id": "farming",
+    "inputs": {"Water": 1.0},
+    "outputs": {"Food": 2.0},
+    "labor_required": 1
+  },
+  {
+    "id": "waterworks",
+    "inputs": {},
+    "outputs": {"Water": 3.0},
+    "labor_required": 1
+  },
+  {
+    "id": "mining",
+    "inputs": {},
+    "outputs": {"Ore": 1.5},
+    "labor_required": 1
+  }
+]
