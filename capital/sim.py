@@ -8,7 +8,6 @@ from typing import Dict, List
 
 from .model import Firm, Household, Inventory, MarketAllocation, MarketOrder, MarketState, Recipe
 from .systems import ConsumptionSystem, FirmSystem, LaborSystem, MarketSystem, ProductionSystem
-from .world import World
 
 
 @dataclass
@@ -17,8 +16,6 @@ class SimulationConfig:
     seed: int
     households: int
     workers_per_firm: int
-    world_width: int
-    world_height: int
 
 
 class Simulation:
@@ -31,7 +28,6 @@ class Simulation:
         self.recipes = self._load_recipes()
         self.market = MarketState(prices={good: values["base_price"] for good, values in self.goods.items()})
 
-        self.world = World.generate(config.world_width, config.world_height, config.seed)
         self.households: List[Household] = [
             Household(household_id=f"household_{i + 1}", cash=50.0) for i in range(config.households)
         ]
@@ -44,7 +40,6 @@ class Simulation:
         self.market_system = MarketSystem()
         self.consumption_system = ConsumptionSystem()
         self.firm_system = FirmSystem(base_prices={g: v["base_price"] for g, v in self.goods.items()})
-        self.rng = random.Random(config.seed)
 
     def _load_goods(self) -> Dict[str, Dict[str, float]]:
         with (self.data_path / "goods.json").open() as handle:
@@ -174,30 +169,9 @@ class Simulation:
             for recipe_id, recipe in self.recipes.items()
         }
         self.firm_system.consider_entry(self.firms, self.market.prices, recipe_lookup)
-        if step % 5 == 0:
-            self._place_buildings()
 
         if step % 10 == 0:
             self._log_state(step)
-
-    def _place_buildings(self) -> None:
-        zoning = {
-            "forestry": ["Forest"],
-            "farming": ["FertileLand"],
-            "waterworks": ["River"],
-            "mining": ["Ore"],
-        }
-        for firm in self.firms:
-            if not firm.active:
-                continue
-            if firm.cash < 30.0:
-                continue
-            building_type = firm.recipe.recipe_id
-            allowed = zoning.get(building_type, ["Empty"])
-            spot = self.world.find_empty_tile(allowed, self.rng)
-            if spot:
-                self.world.place_building(spot[0], spot[1], building_type)
-                firm.cash -= 20.0
 
     def _log_state(self, step: int) -> None:
         unemployed = sum(1 for h in self.households if h.employed_by is None)
@@ -213,19 +187,11 @@ class Simulation:
             self.tick(step)
 
 
-def run_simulation(ticks: int, seed: int, world_width: int, world_height: int) -> Simulation:
-    config = SimulationConfig(
-        ticks=ticks,
-        seed=seed,
-        households=12,
-        workers_per_firm=2,
-        world_width=world_width,
-        world_height=world_height,
-    )
+def run_simulation(ticks: int, seed: int) -> None:
+    config = SimulationConfig(ticks=ticks, seed=seed, households=12, workers_per_firm=2)
     simulation = Simulation(data_path=Path("data"), config=config)
     simulation.run()
-    return simulation
 
 
 if __name__ == "__main__":
-    run_simulation(ticks=200, seed=42, world_width=20, world_height=20)
+    run_simulation(ticks=200, seed=42)

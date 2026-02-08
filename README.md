@@ -8,14 +8,6 @@ This repository contains a headless simulation core for **Capital**, a minimal c
 python main.py --ticks 200 --seed 42
 ```
 
-## Visual Mode
-
-```bash
-python main.py --visual --width 20 --height 20 --tick-ms 200
-```
-
-Close the window to stop the simulation.
-
 ## Data
 
 * `data/goods.json` defines goods and base utility.
